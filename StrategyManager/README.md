@@ -11,7 +11,12 @@ Run the setup.sh file from the command line:
 
 `sh setup.sh`
 
-This command will set up a docker network named nemoulous and add zookeeper and kafka to it so that we can create a container that will be able to connect to it
+This command will set up a docker network named nemoulous and add containers running the following to it:
+1. zookeeper
+2. kafka
+3. postgresql 
+
+It will then create a container to compile the scala code here, and then emit the compiled artifact to be run in a different, clean container.
 
 
 

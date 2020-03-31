@@ -26,6 +26,8 @@ case class Settings(
   val portNumber = getOrElse("db.portNumber", _.getInt, 5432)
 
 
+  val kafkaBootstrapServers = "nemoulous:9092"
+
   lazy val ds = {
     val internalConfig = {
       import java.io.PrintWriter
