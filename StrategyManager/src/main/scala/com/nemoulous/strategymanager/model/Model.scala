@@ -25,21 +25,16 @@ trait Model[S <: Signal, State] {
     Behaviors.setup[Asking[S]] {
       context =>
         context.system.receptionist ! Receptionist.Register(Model.getServiceKey[S](), context.self)
+        initialize()
         Behaviors.supervise(handler(initialState())).onFailure[Exception](SupervisorStrategy.restart)
-
     }
 
   private def handler(state: State): Behavior[Asking[S]] = Behaviors.receiveMessage {
     message =>
       val response = handleSignal(ModelInput(state, message.payload))
-      message.replyTo ! DesiredWeight("NG", 1.0)
+      message.replyTo ! response.action
       handler(response.state)
   }
-
-  //
-  //  def getFlow(): Flow[S, Action, NotUsed] = Flow[S]
-  //    .via(ActorFlow.ask(actor(initialState())))
-
 }
 
 object Model {

@@ -20,7 +20,7 @@ object ConvergingSpreads extends Model[ConvergingSpreadsSignals, ConvergingSprea
     case ModelInput(state, signal) =>
       signal match {
         case FutureSpread(futureType, _, _, spread) =>
-          ModelOutput(ConvergingSpreadsState(state.state + 1), DesiredWeight(futureType, spread))
+          ModelOutput(ConvergingSpreadsState(state.state + 1), DesiredWeight(futureType, state.state.toDouble))
       }
   }
 

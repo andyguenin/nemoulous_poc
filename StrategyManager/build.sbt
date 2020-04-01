@@ -20,6 +20,8 @@ libraryDependencies += "com.typesafe.akka" %% "akka-stream-kafka" % "2.0.2"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.11"
 
+libraryDependencies += "io.spray" %%  "spray-json" % "1.3.5"
+
 libraryDependencies += "com.zaxxer" % "HikariCP" % "3.3.1"
 
 libraryDependencies += "org.postgresql" % "postgresql" % "9.4-1200-jdbc41"
