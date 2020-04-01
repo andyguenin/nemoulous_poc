@@ -139,18 +139,20 @@ class DbCandleLoader(Loader):
 
         for i in range(int(divmod((max_date - min_date).total_seconds(), 60)[0]) + 1):
             time = min_date + timedelta(minutes=i)
-            l = data[data['time'] == time].copy()
+            l = data[data['time'] == time].copy().reset_index()
             cols = [elem[1] for elem in columns if elem[0] >= time and elem[1] in l.columns][:12]
             insert = l[['time', *cols]]
             new_column_names = ['time', *['m' + str(i) for i in range(len(cols))]]
             insert.columns = new_column_names
-            # add_column_names = {'m' + str(i + len(cols)): NaN for i in range(12 - len(cols))}
-            # insert = insert.assign(**add_column_names).reset_index().to_dict()
-            if len(insert['time']) > 0:
-                insert = [None if type(insert[key][0]) == float and math.isnan(insert[key][0]) else insert[key][0] for key in insert][1:]
+            if not insert.empty:
+                insert = [None if type(insert[key][0]) == float and math.isnan(insert[key][0]) else insert[key][0] for key in insert]
                 insert[0] = insert[0].strftime('%Y-%m-%d %H:%M')
                 inserts.append(tuple(['NG', data_type.name, tag, *insert]))
 
+        # c.executemany(
+        #     'insert into commodity_future_term_structure (product, type, tag, time, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        #     inserts)
+        # conn.commit()
         try:
             c.executemany('insert into commodity_future_term_structure (product, type, tag, time, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', inserts)
             conn.commit()
@@ -167,7 +169,7 @@ if __name__ == '__main__':
     datetime_end = datetime.datetime(2019, 1, 3)
     for i in range((datetime_end - datetime_start).days + 1):
         (df,) = DbCandleLoader().loadTimeSeries((CandleDataType.CLOSE,), dateBegin=datetime_start + timedelta(days=i), dateEnd=datetime_start + timedelta(days=i + 1))
-        if not vol.empty:
-            DbCandleLoader().storeTermStructure(df, CandleDataType.CLOSEu, "MIN")
+        if not df.empty:
+            DbCandleLoader().storeTermStructure(df, CandleDataType.CLOSE, "MIN")
 
 

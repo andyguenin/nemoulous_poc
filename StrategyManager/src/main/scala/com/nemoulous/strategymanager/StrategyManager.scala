@@ -36,7 +36,8 @@ object StrategyManager {
 
     val models = ActorSystem((new ModelGuardian).getBehavior(), "model-guardian")
 
-    A.getConsumer(actionTopic).map(_.value().parseJson).runForeach(println)
+
+//    A.getJsonConsumer("nemoulous-signal").runForeach(println)
 
     models.whenTerminated.onComplete{
       case Success(s) => println("complete")

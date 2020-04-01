@@ -23,8 +23,6 @@ class ModelGuardian(override implicit val system: classic.ActorSystem) extends K
 
   val models = List(
     ConvergingSpreads
-//    , ConvergingSpreads, ConvergingSpreads, ConvergingSpreads, ConvergingSpreads,
-//    ConvergingSpreads, ConvergingSpreads, ConvergingSpreads, ConvergingSpreads, ConvergingSpreads
   )
 
   def getBehavior(): Behavior[Receptionist.Listing] = {
@@ -45,14 +43,15 @@ class ModelGuardian(override implicit val system: classic.ActorSystem) extends K
     Behaviors.receiveMessagePartial[Receptionist.Listing] {
       case Model.genericServiceKey.Listing(listings) if listings.nonEmpty =>
         val newModels = listings.diff(existingModels)
-        
+
 
         newModels.foreach {
-          model => getJsonConsumer("nemoulous-signal")
-            .map(Signal.getObject)
-            .via(ActorFlow.ask(model)((el: Signal, replyTo: ActorRef[Action]) => Asking(el, replyTo)))
-            .map(r => Action.toJson(r))
-            .runWith(getJsonProducer("nemoulous-action"))
+          model =>
+            getJsonConsumer("nemoulous-signal")
+              .map(Signal.getObject)
+              .via(ActorFlow.ask(model)((el: Signal, replyTo: ActorRef[Action]) => Asking(el, replyTo)))
+              .map(r => Action.toJson(r))
+              .runWith(getJsonProducer("nemoulous-action"))
 
         }
 

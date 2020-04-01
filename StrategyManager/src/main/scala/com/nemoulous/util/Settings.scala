@@ -26,7 +26,7 @@ case class Settings(
   val portNumber = getOrElse("db.portNumber", _.getInt, 5432)
 
 
-  val kafkaBootstrapServers = "nemoulous:9092"
+  val kafkaBootstrapServers = getOrElse("akka.kafka.consumer.kafka-clients.bootstrap.servers", _.getString, "localhost:9092")
 
   lazy val ds = {
     val internalConfig = {
