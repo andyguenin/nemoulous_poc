@@ -8,7 +8,7 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 case class Settings(
                    args: Array[String]
                    ) {
-  val config = ConfigFactory.load(args.head)
+  val config = ConfigFactory.load(args.headOption.getOrElse("dev"))
 
   private def getOrElse[T](path: String, c: Config => String => T, default: => T): T = {
     if(config.hasPath(path)) {

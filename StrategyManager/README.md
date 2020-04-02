@@ -1,25 +1,15 @@
 # Strategy Manager for Nemoulous
 
-IGNORE THIS FOR NOW. It is out of date!
-
 ## Prerequisites
 
 1. You are running on a Mac or *nix machine that has access to a bash-like shell
 2. Docker must be installed on your computer
+3. Zookeeper and Kafka are running on your localhost. Kafka must be exposed on port 9092
+4. You have scala's SBT installed.
 
 ## Setup
 
-Run the setup.sh file from the command line:
+Run `sbt compile` in order to build the scala application.
 
-`sh setup.sh`
-
-This command will set up a docker network named nemoulous and add containers running the following to it:
-1. zookeeper
-2. kafka
-3. postgresql 
-
-It will then create a container to compile the scala code here, and then emit the compiled artifact to be run in a different, clean container.
-
-
-
+Run `sbt run` in order to run the application.
 

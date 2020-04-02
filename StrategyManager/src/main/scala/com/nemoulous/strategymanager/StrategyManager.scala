@@ -17,7 +17,7 @@ object StrategyManager {
 
   def main(args: Array[String]): Unit = {
     implicit val settings = Settings(args)
-    migrate(settings)
+//    migrate(settings)
     implicit val system = OldActorSystem("kafka", settings.config)
     implicit val mat = Materializer(system)
     implicit val ec = system.dispatcher
