@@ -3,12 +3,12 @@ package com.nemoulous.strategymanager.model.implementations.spread
 import com.nemoulous.strategymanager.model.{Action, DesiredWeight, Model, ModelInput, ModelOutput, NoAction}
 import com.nemoulous.strategymanager.signal.{ConvergingSpreadsSignals, FutureSpread}
 
-case class DivergingSpreadState(
-                                 lastSpreads: List[Double],
-                                 tradeOn: Boolean,
-                                 ticksSinceTradeOn: Int
-                               )
 
+/**
+ * Diverging Spread model. See associated README for detailed explanation on how it works.
+ *
+ * @param lookback
+ */
 class DivergingSpread(val lookback: Int) extends Model[ConvergingSpreadsSignals, DivergingSpreadState] {
   override protected def initialize(): Unit = ()
 
@@ -28,7 +28,7 @@ class DivergingSpread(val lookback: Int) extends Model[ConvergingSpreadsSignals,
           val modelOutput: ModelOutput[DivergingSpreadState, Action] =
             if (state.lastSpreads.size == lookback) {
               if (state.tradeOn) {
-                if (state.ticksSinceTradeOn == 10) {
+                if (state.ticksSinceTradeOn == lookback * 2) {
                   ModelOutput(DivergingSpreadState(newSpread, false, 0), DesiredWeight(futureType, 0))
                 } else {
                   ModelOutput(state.copy(lastSpreads = newSpread, ticksSinceTradeOn = state.ticksSinceTradeOn + 1), NoAction)
@@ -55,3 +55,16 @@ class DivergingSpread(val lookback: Int) extends Model[ConvergingSpreadsSignals,
   override val modelName: String = "Diverging Spreads"
 
 }
+
+
+/**
+ * State of the Diverging Spread model
+ * @param lastSpreads list of spreads, sorted from most recent to least recent
+ * @param tradeOn is there a trade currently on?
+ * @param ticksSinceTradeOn How many candles have come in since tradeOn was toggled to be true?
+ */
+case class DivergingSpreadState(
+                                 lastSpreads: List[Double],
+                                 tradeOn: Boolean,
+                                 ticksSinceTradeOn: Int
+                               )
