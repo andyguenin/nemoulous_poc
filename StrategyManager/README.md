@@ -1,5 +1,7 @@
 # Strategy Manager for Nemoulous
 
+IGNORE THIS FOR NOW. It is out of date!
+
 ## Prerequisites
 
 1. You are running on a Mac or *nix machine that has access to a bash-like shell
