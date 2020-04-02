@@ -45,7 +45,7 @@ object FutureSpreadName extends SignalName {
  */
 
 object Signal {
-  def formatter[S <: Signal, SN <: SignalName](s: SN, rootJsonFormat: RootJsonFormat[S]): RootJsonFormat[S] = {
+  private def formatter[S <: Signal, SN <: SignalName](s: SN, rootJsonFormat: RootJsonFormat[S]): RootJsonFormat[S] = {
     new RootJsonFormat[S] {
       override def write(obj: S): JsValue = {
         JsObject(
@@ -58,7 +58,6 @@ object Signal {
       }
     }
   }
-
 
 
   implicit val futureSpreadConverter = formatter(FutureSpreadName, jsonFormat4(FutureSpread))
