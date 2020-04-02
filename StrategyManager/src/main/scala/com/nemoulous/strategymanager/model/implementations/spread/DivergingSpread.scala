@@ -23,25 +23,42 @@ class DivergingSpread(val lookback: Int) extends Model[ConvergingSpreadsSignals,
       signal match {
         case FutureSpread(futureType, _, _, spread) =>
 
+          // All possible ModelOutputs will need to update the state to include the newest datapoint
           val newSpread = (spread :: state.lastSpreads).take(lookback)
 
           val modelOutput: ModelOutput[DivergingSpreadState, Action] =
+
+          // lookback:if Do we have enough history here to look back to the previous n- lookback values?
             if (state.lastSpreads.size == lookback) {
+              // tradeon:if Do we have a trade on?
               if (state.tradeOn) {
+                // timeelapse:if Have lookback * 2 periods happened?
                 if (state.ticksSinceTradeOn == lookback * 2) {
+                  // We undo the trade we previously put on
                   ModelOutput(DivergingSpreadState(newSpread, false, 0), DesiredWeight(futureType, 0))
                 } else {
+                  // We take no action, but update the state to indicate one more period has passed
                   ModelOutput(state.copy(lastSpreads = newSpread, ticksSinceTradeOn = state.ticksSinceTradeOn + 1), NoAction)
                 }
-              } else {
+              }
+              //tradeon:else No trade is current on
+              else {
                 val allIncreasing = state.lastSpreads.zip(state.lastSpreads.tail).forall { case (front, back) => front > back }
-                if(allIncreasing) {
+                // allincreasing:if Are all spreads increasing?
+                if (allIncreasing) {
+                  // Put the trade on!
                   ModelOutput(DivergingSpreadState(newSpread, true, 0), DesiredWeight(futureType, 1))
-                } else {
+                }
+                // allincreasing:else Not all spreads are increasing
+                else {
+                  // Do nothing
                   ModelOutput(state.copy(lastSpreads = newSpread), NoAction)
                 }
               }
-            } else {
+            }
+            // lookback:else
+            else {
+              // Do nothing
               ModelOutput(state.copy(lastSpreads = newSpread), NoAction)
             }
 
@@ -59,8 +76,9 @@ class DivergingSpread(val lookback: Int) extends Model[ConvergingSpreadsSignals,
 
 /**
  * State of the Diverging Spread model
- * @param lastSpreads list of spreads, sorted from most recent to least recent
- * @param tradeOn is there a trade currently on?
+ *
+ * @param lastSpreads       list of spreads, sorted from most recent to least recent
+ * @param tradeOn           is there a trade currently on?
  * @param ticksSinceTradeOn How many candles have come in since tradeOn was toggled to be true?
  */
 case class DivergingSpreadState(
