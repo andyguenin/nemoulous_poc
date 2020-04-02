@@ -43,7 +43,7 @@ if __name__ == '__main__':
     df = DbTermStructureLoader('nemoulous.db').load()
     df = df[(df['m0'].notna()) & (df['m1'].notna()) & (df['time'] >= datetime(2018, 1, 1)) & (df['time'] <= datetime(2018, 1, 5))].reset_index()
     for index, row in df.iterrows():
-        if index < 20:
+        if index < 100000:
             obj = {
                 'name': 'futurespread',
                 'futureType': 'NG',

@@ -7,12 +7,11 @@ import akka.{actor => classic}
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.receptionist.Receptionist
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.typed.scaladsl.ActorFlow
 import akka.util.Timeout
-import com.nemoulous.strategymanager.model.implementations.spread.ConvergingSpreads
+import com.nemoulous.strategymanager.model.implementations.spread.DivergingSpread
 import com.nemoulous.strategymanager.provider.ActorSystemProvider
-import com.nemoulous.strategymanager.signal.{FutureSpread, Signal}
+import com.nemoulous.strategymanager.signal.Signal
 import com.nemoulous.util.{KafkaConsumer, KafkaProducer}
 
 import scala.concurrent.duration._
@@ -22,7 +21,7 @@ class ModelGuardian(override implicit val system: classic.ActorSystem) extends K
   implicit val t = Timeout(FiniteDuration(10, TimeUnit.SECONDS))
 
   val models = List(
-    ConvergingSpreads
+    new DivergingSpread(5)
   )
 
   def getBehavior(): Behavior[Receptionist.Listing] = {
@@ -50,8 +49,10 @@ class ModelGuardian(override implicit val system: classic.ActorSystem) extends K
             getJsonConsumer("nemoulous-signal")
               .map(Signal.getObject)
               .via(ActorFlow.ask(model)((el: Signal, replyTo: ActorRef[Action]) => Asking(el, replyTo)))
+              .filter(r => r != NoAction)
               .map(r => Action.toJson(r))
-              .runWith(getJsonProducer("nemoulous-action"))
+//              .runWith(getJsonProducer("nemoulous-action"))
+              .runForeach(println)
 
         }
 
