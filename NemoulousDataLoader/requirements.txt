@@ -1,6 +1,6 @@
 awscli==1.16.290
 botocore==1.13.26
-certifi==2019.11.28
+certifi==2022.12.7
 colorama==0.4.1
 docutils==0.15.2
 jmespath==0.9.4
